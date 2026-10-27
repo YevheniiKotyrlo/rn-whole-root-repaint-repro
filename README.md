@@ -22,11 +22,13 @@ With Developer options › Show GPU view updates on, each blink flashes the whol
 
 ## What it costs
 
-On a Snapdragon phone the frame after the caret's 500 ms pause also waits for the GPU to wake from idle, so the whole-root repaint lands on a slow GPU. Release RNTester, built from [#59230](https://github.com/react/react-native/pull/59230)'s branch, whose one change is to RNTester's legacy native view example, with its Components search field focused, against Settings search, on a Galaxy S23 (SM-S911B), Android 14, HWUI on GL; each window is 12 s with `dumpsys gfxinfo <package> framestats`, counting the blinks after ~475 ms with no frame:
+The fill: every caret blink redraws every pixel of the root. I couldn't measure a frame-time cost beyond that. On the two Snapdragon phones below, the frame after the caret's 500 ms pause waits for the GPU to wake from idle, and putting the field inside a parent that clips its children (the [`verify/clip-children`](https://github.com/YevheniiKotyrlo/rn-whole-root-repaint-repro/tree/verify/clip-children) branch, whose `ReproducerClippingView` is a `ReactViewGroup` with `clipChildren` on) bounds each blink's repaint to the field without changing how late those frames finish. Release APKs of both branches, 12 s each with `dumpsys gfxinfo <package> framestats`, counting the caret frames after 400 ms or more with no frame:
 
-| | Repainted per blink frame | GPU done after the swap | Missed 16.67 ms |
-| --- | --- | --- | --- |
-| RNTester | `0 81 1080 2295`, the React root, on 24 of 24 | 4.7–18.0 ms, median 16.1 | 24 of 25 |
-| Settings search | `156 181 822 268`, the field, or `0 81 1080 321`, the search bar | 6.8–12.1 ms | 0 of 12 |
+| Phone | Branch | Repainted per blink frame | GPU done after the swap | Missed the deadline |
+| --- | --- | --- | --- | --- |
+| Galaxy S23 (SM-S911B), Android 14, HWUI on GL | `main` | `0 0 1080 2340`, the whole window, on 23 of 23 | 6.8–16.5 ms, median 14.6 | 25 of 26 at 16.67 ms |
+| Galaxy S23 | `verify/clip-children` | `48 129 1032 271`, the field, on 23 of 24 | 9.4–16.9 ms, median 15.3 | 23 of 24 |
+| RedMagic NX809J, Android 16, HWUI on Vulkan | `main` | `0 0 1216 2688`, the whole window, on 24 of 24 | 10.7–16.2 ms, median 14.6 | 19 of 24 at 13.67 ms |
+| RedMagic NX809J | `verify/clip-children` | `52 159 1164 312`, the field, on 22 of 24 | 11.6–15.4 ms, median 14.2 | 20 of 23 |
 
-The frame tables are [`readings/rntester-s23-framestats.txt`](readings/rntester-s23-framestats.txt) and [`readings/settings-s23-framestats.txt`](readings/settings-s23-framestats.txt).
+The GPU columns leave out the few frames the GPU was still awake for, which finish about 1 ms after the swap on both branches. The frame tables are in [`readings/`](readings/), beside a release RNTester and Android's Settings search on the same S23.
