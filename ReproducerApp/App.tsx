@@ -1,44 +1,52 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, Text, TextInput } from 'react-native';
 import {
   SafeAreaProvider,
-  useSafeAreaInsets,
+  SafeAreaView,
 } from 'react-native-safe-area-context';
 
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+const ROWS = Array.from({ length: 40 }, (_, index) => `Row ${index + 1}`);
 
+function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
+      <StatusBar barStyle="dark-content" />
+      <SafeAreaView style={styles.screen}>
+        <TextInput
+          autoFocus
+          placeholder="The caret blinks here"
+          style={styles.field}
+        />
+        <ScrollView>
+          {ROWS.map(row => (
+            <Text key={row} style={styles.row}>
+              {row}
+            </Text>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }
 
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  field: {
+    margin: 16,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#888888',
+    borderRadius: 8,
+    fontSize: 18,
+    color: '#000000',
+  },
+  row: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#000000',
   },
 });
 
