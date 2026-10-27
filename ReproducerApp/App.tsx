@@ -1,8 +1,20 @@
-import { ScrollView, StatusBar, StyleSheet, Text, TextInput } from 'react-native';
+import {
+  requireNativeComponent,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+} from 'react-native';
+import type { ViewProps } from 'react-native';
 import {
   SafeAreaProvider,
   SafeAreaView,
 } from 'react-native-safe-area-context';
+
+const ClippingView = requireNativeComponent<ViewProps>(
+  'ReproducerClippingView',
+);
 
 const ROWS = Array.from({ length: 40 }, (_, index) => `Row ${index + 1}`);
 
@@ -11,11 +23,13 @@ function App() {
     <SafeAreaProvider>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView style={styles.screen}>
-        <TextInput
-          autoFocus
-          placeholder="The caret blinks here"
-          style={styles.field}
-        />
+        <ClippingView style={styles.fieldBox}>
+          <TextInput
+            autoFocus
+            placeholder="The caret blinks here"
+            style={styles.field}
+          />
+        </ClippingView>
         <ScrollView>
           {ROWS.map(row => (
             <Text key={row} style={styles.row}>
@@ -33,8 +47,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#ffffff',
   },
-  field: {
+  fieldBox: {
     margin: 16,
+  },
+  field: {
     paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: '#888888',
