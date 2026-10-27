@@ -1,5 +1,7 @@
 # A caret blink repaints the whole React root on Android
 
+[react/react-native#59534](https://github.com/react/react-native/issues/59534)
+
 React Native 0.88.0, from the [React Native reproducer template](https://github.com/react-native-community/reproducer-react-native). `App.tsx` focuses a `TextInput` above a list, so the blinking caret is the only thing on screen that changes.
 
 ## Steps
